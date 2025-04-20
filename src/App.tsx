@@ -6,7 +6,8 @@ import SignupPage from './pages/SignupPage';
 import HomePage from './pages/HomePage';
 import EventsPage from './pages/EventPage';
 import ProfilePage from './pages/ProfilePage';
-
+import AdminLoginPage from './pages/adminPage';
+import AdminDashboard from './pages/adminDashboard';
 function App() {
   return (
     <div className="d-flex">
@@ -25,6 +26,8 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
       </div>
     </div>
