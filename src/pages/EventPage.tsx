@@ -10,7 +10,7 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
-import { Calendar, Clock, MapPin, Users, Search, Filter, Star, Heart } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, Heart } from 'lucide-react';
 import axios from '../axiosConfig';
 
 // Event category color mapping - matching the admin panel
@@ -57,7 +57,7 @@ export default function EventsPage() {
       const response = await axios.get('/events/getEvents', {
         withCredentials: true,
       });
-      
+
       // Add a small delay for animation effect
       setTimeout(() => {
         setEvents(response.data);
@@ -84,7 +84,7 @@ export default function EventsPage() {
   useEffect(() => {
     fetchEvents();
     fetchRegisteredEvents();
-    
+
     // Mock favorite events (would normally come from an API)
     const mockFavorites = ['123', '456']; // Example IDs
     setFavoriteEvents(mockFavorites);
@@ -155,7 +155,7 @@ export default function EventsPage() {
 
   const renderEventCards = (eventList) => {
     const filteredEvents = filterEvents(eventList);
-    
+
     return (
       <Row className="g-4">
         {isLoading ? (
@@ -183,14 +183,14 @@ export default function EventsPage() {
             const isFavorite = favoriteEvents.includes(event._id);
             const registrationPercentage = (event.attendees / event.capacity) * 100;
             const isAlmostFull = registrationPercentage >= 80;
-            
+
             return (
               <Col md={6} lg={4} className="mb-2" key={event._id} style={{
                 animation: "fadeIn 0.5s ease-in-out",
               }}>
-                <Card 
-                  className="h-100 border-0 shadow" 
-                  style={{ 
+                <Card
+                  className="h-100 border-0 shadow"
+                  style={{
                     overflow: "hidden",
                     transition: "transform 0.3s, box-shadow 0.3s",
                   }}
@@ -203,10 +203,10 @@ export default function EventsPage() {
                     e.currentTarget.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
                   }}
                 >
-                  <div 
-                    className="card-img-top" 
-                    style={{ 
-                      height: "8px", 
+                  <div
+                    className="card-img-top"
+                    style={{
+                      height: "8px",
                       backgroundColor: categoryColor,
                     }}
                   ></div>
@@ -214,17 +214,17 @@ export default function EventsPage() {
                     <div className="d-flex justify-content-between align-items-start mb-2">
                       <Card.Title className="mb-0">{event.title}</Card.Title>
                       <div>
-                        <Button 
-                          variant="link" 
-                          className="p-0 me-2" 
+                        <Button
+                          variant="link"
+                          className="p-0 me-2"
                           onClick={() => toggleFavorite(event._id)}
                           style={{ color: isFavorite ? '#F59E0B' : '#6B7280' }}
                         >
                           <Heart size={18} fill={isFavorite ? '#F59E0B' : 'none'} />
                         </Button>
-                        <Badge 
+                        <Badge
                           pill
-                          style={{ 
+                          style={{
                             backgroundColor: categoryColor,
                             color: textColor
                           }}
@@ -233,98 +233,44 @@ export default function EventsPage() {
                         </Badge>
                       </div>
                     </div>
-                    
+
                     <Card.Text>{event.description}</Card.Text>
-                    
+
                     <div className="mb-2 d-flex align-items-center gap-2" style={{ color: "#6B7280" }}>
                       <Calendar size={16} style={{ color: categoryColor }} />
                       {new Date(event.date).toLocaleDateString()}
                     </div>
-                    
+
                     <div className="mb-2 d-flex align-items-center gap-2" style={{ color: "#6B7280" }}>
                       <Clock size={16} style={{ color: categoryColor }} />
                       {event.time}
                     </div>
-                    
+
                     <div className="mb-2 d-flex align-items-center gap-2" style={{ color: "#6B7280" }}>
                       <MapPin size={16} style={{ color: categoryColor }} />
                       {event.location}
                     </div>
-                    
+
                     <div className="mb-2 d-flex align-items-center gap-2" style={{ color: "#6B7280" }}>
                       <Users size={16} style={{ color: categoryColor }} />
-                      <div className="d-flex justify-content-between w-100 align-items-center">
-                        <span>{event.attendees}/{event.capacity}</span>
-                        {isAlmostFull && (
-                          <Badge bg="warning" text="dark" pill className="ms-2">Almost Full</Badge>
-                        )}
-                      </div>
+                      {event.attendees} / {event.capacity}
                     </div>
-                    
-                    <ProgressBar 
-                      now={registrationPercentage} 
-                      className="mb-3" 
-                      variant={
-                        registrationPercentage >= 80 ? "danger" :
-                        registrationPercentage >= 50 ? "warning" : "success"
-                      }
-                      style={{ height: "8px" }}
-                    />
-                    
+
+                    {isAlmostFull && (
+                      <div className="mb-2 text-warning">Hurry, only a few spots left!</div>
+                    )}
+
+                    <ProgressBar now={registrationPercentage} label={`${Math.round(registrationPercentage)}%`} />
+
                     {selectedTab === 'upcoming' && (
                       <Button
-                        style={{
-                          backgroundColor: categoryColor,
-                          borderColor: categoryColor,
-                          color: textColor,
-                          transition: "transform 0.2s, opacity 0.2s",
-                          position: "relative",
-                          overflow: "hidden"
-                        }}
-                        className="w-100 position-relative"
+                        variant="primary"
+                        className="mt-3 w-100"
                         onClick={() => registerForEvent(event._id)}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.opacity = "0.9";
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.opacity = "1";
-                        }}
+                        disabled={event.attendees >= event.capacity}
                       >
-                        <div 
-                          style={{ 
-                            position: "absolute", 
-                            top: 0, 
-                            left: "-100%", 
-                            width: "200%", 
-                            height: "100%", 
-                            background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)`,
-                            transition: "left 0.5s"
-                          }}
-                          className="shine-effect"
-                        ></div>
-                        Register Now
+                        {event.attendees >= event.capacity ? 'Full' : 'Register'}
                       </Button>
-                    )}
-                    
-                    {selectedTab === 'registered' && (
-                      <div className="d-flex gap-2">
-                        <Button 
-                          variant="outline-secondary" 
-                          className="w-50"
-                        >
-                          Cancel
-                        </Button>
-                        <Button 
-                          style={{
-                            backgroundColor: categoryColor,
-                            borderColor: categoryColor,
-                            color: textColor
-                          }}
-                          className="w-50"
-                        >
-                          View Details
-                        </Button>
-                      </div>
                     )}
                   </Card.Body>
                 </Card>
@@ -337,170 +283,52 @@ export default function EventsPage() {
   };
 
   return (
-    <div style={{ 
-      background: "linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%)",
-      minHeight: "100vh",
-      paddingTop: "2rem",
-      paddingBottom: "2rem"
-    }}>
-      <Container>
-        {feedback.show && (
-          <div className="mb-4 animate__animated animate__fadeIn">
-            <div
-              className={`alert alert-${feedback.variant} alert-dismissible fade show shadow-sm`}
-              role="alert"
-              style={{ 
-                borderLeft: `4px solid ${feedback.variant === 'success' ? '#10B981' : '#EF4444'}`,
-                borderRadius: "4px",
-                animation: "slideDown 0.3s ease-out"
-              }}
+    <Container>
+      <h2 className="my-4">Upcoming Events</h2>
+
+      <Tabs
+        activeKey={selectedTab}
+        onSelect={(tab) => setSelectedTab(tab)}
+        id="events-tabs"
+        className="mb-4"
+      >
+        <Tab eventKey="upcoming" title="Upcoming">
+          <div className="mb-4">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search for events"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div className="mb-4">
+            <select
+              className="form-select"
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              value={selectedCategory}
             >
-              <div className="d-flex align-items-center">
-                {feedback.variant === 'success' ? (
-                  <div className="me-2 text-success">✓</div>
-                ) : (
-                  <div className="me-2 text-danger">✕</div>
-                )}
-                {feedback.message}
-              </div>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => setFeedback({ ...feedback, show: false })}
-              ></button>
-            </div>
+              {categories.map((category, index) => (
+                <option key={index} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
           </div>
-        )}
 
-        <div className="text-center mb-5">
-          <h1 className="display-4 fw-bold" style={{ 
-            color: "#4F46E5",
-            textShadow: "2px 2px 4px rgba(0,0,0,0.1)" 
-          }}>
-            <Calendar className="me-2" />
-            Events Explorer
-          </h1>
-          <p className="lead text-muted">Browse and register for exciting upcoming events</p>
+          {renderEventCards(events)}
+        </Tab>
+        <Tab eventKey="registered" title="Registered">
+          {renderEventCards(registeredEvents)}
+        </Tab>
+      </Tabs>
+
+      {feedback.show && (
+        <div className={`alert alert-${feedback.variant} mt-4`} role="alert">
+          {feedback.message}
         </div>
-
-        <div className="card border-0 shadow-sm mb-4 p-3">
-          <div className="row g-3">
-            <div className="col-md-6">
-              <div className="input-group">
-                <span className="input-group-text bg-white border-end-0">
-                  <Search size={18} />
-                </span>
-                <input 
-                  type="text" 
-                  className="form-control border-start-0" 
-                  placeholder="Search events by title, description or location" 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="col-md-6">
-              <div className="d-flex gap-2 flex-wrap">
-                <div className="input-group">
-                  <span className="input-group-text bg-white border-end-0">
-                    <Filter size={18} />
-                  </span>
-                  <select 
-                    className="form-select border-start-0"
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                  >
-                    {categories.map(category => (
-                      <option key={category} value={category}>{category}</option>
-                    ))}
-                  </select>
-                </div>
-                <Button 
-                  style={{
-                    background: "linear-gradient(45deg, #4F46E5, #7C3AED)",
-                    border: "none",
-                  }}
-                >
-                  Create Event
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <Tabs 
-          activeKey={selectedTab} 
-          onSelect={(k) => setSelectedTab(k)} 
-          className="mb-4" 
-          fill
-          style={{
-            borderBottom: "2px solid #f0f0f0"
-          }}
-        >
-          <Tab 
-            eventKey="upcoming" 
-            title={
-              <div className="d-flex align-items-center">
-                <Calendar size={16} className="me-2" />
-                <span>Upcoming</span>
-              </div>
-            }
-          >
-            {renderEventCards(events)}
-          </Tab>
-
-          <Tab 
-            eventKey="registered" 
-            title={
-              <div className="d-flex align-items-center">
-                <Star size={16} className="me-2" />
-                <span>Registered</span>
-              </div>
-            }
-          >
-            {renderEventCards(registeredEvents)}
-          </Tab>
-
-          <Tab 
-            eventKey="past" 
-            title={
-              <div className="d-flex align-items-center">
-                <Clock size={16} className="me-2" />
-                <span>Past Events</span>
-              </div>
-            }
-          >
-            <div className="text-center py-5">
-              <div style={{ fontSize: "4rem", color: "#6B7280" }}>
-                <Clock size={64} />
-              </div>
-              <h3 className="mt-3">Past Events</h3>
-              <p className="text-muted">This is where your attended events will appear</p>
-            </div>
-          </Tab>
-        </Tabs>
-      </Container>
-      
-      {/* CSS for animations */}
-      <style tsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .btn:hover .shine-effect {
-          left: 100%;
-        }
-        
-        .badge {
-          font-weight: 500;
-        }
-      `}</style>
-    </div>
+      )}
+    </Container>
   );
 }
