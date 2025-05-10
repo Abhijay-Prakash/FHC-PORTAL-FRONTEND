@@ -15,7 +15,7 @@ function App() {
       {/* Main content area */}
       <div
         className="flex-grow-1 p-3 "
-        style={{ marginLeft: '75px', width: '100%' }}
+        style={{ marginLeft: '0', transition: 'margin-left 0.3s ease', }}
       >
         <Routes>
           <Route path="/" element={<HomePage />} />
