@@ -14,7 +14,7 @@ import { Calendar, Clock, MapPin, Users, Heart } from 'lucide-react';
 import axios from '../axiosConfig';
 
 // Event category color mapping - matching the admin panel
-const categoryColors = {
+const categoryColors: { [key: string]: string } = {
   Workshop: "#6366F1", // Indigo
   Webinar: "#EC4899", // Pink
   Conference: "#8B5CF6", // Purple
@@ -26,12 +26,12 @@ const categoryColors = {
 };
 
 // Get color based on category
-const getCategoryColor = (category) => {
+const getCategoryColor = (category: string): string => {
   return categoryColors[category] || categoryColors.Other;
 };
 
 // Get contrasting text color for a background
-const getTextColor = (bgColor) => {
+const getTextColor = (bgColor: string): string => {
   // Simple check for light/dark background
   const r = parseInt(bgColor.slice(1, 3), 16);
   const g = parseInt(bgColor.slice(3, 5), 16);
@@ -40,15 +40,33 @@ const getTextColor = (bgColor) => {
   return brightness > 125 ? "#000000" : "#FFFFFF";
 };
 
+interface Event {
+  _id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  category: string;
+  attendees: number;
+  capacity: number;
+}
+
+interface Feedback {
+  show: boolean;
+  message: string;
+  variant: 'success' | 'danger';
+}
+
 export default function EventsPage() {
-  const [selectedTab, setSelectedTab] = useState('upcoming');
-  const [events, setEvents] = useState([]);
-  const [registeredEvents, setRegisteredEvents] = useState([]);
-  const [feedback, setFeedback] = useState({ show: false, message: '', variant: '' });
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [favoriteEvents, setFavoriteEvents] = useState([]);
+  const [selectedTab, setSelectedTab] = useState<string>('upcoming');
+  const [events, setEvents] = useState<Event[]>([]);
+  const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
+  const [feedback, setFeedback] = useState<Feedback>({ show: false, message: '', variant: 'success' });
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [favoriteEvents, setFavoriteEvents] = useState<string[]>([]);
 
   // Fetch all events
   const fetchEvents = async () => {
@@ -100,7 +118,7 @@ export default function EventsPage() {
   }, [feedback]);
 
   // Handle registration
-  const registerForEvent = async (eventId) => {
+  const registerForEvent = async (eventId: string) => {
     try {
       await axios.post(
         '/events/register',
@@ -119,7 +137,7 @@ export default function EventsPage() {
       );
       setEvents(updatedEvents);
       fetchRegisteredEvents();
-    } catch (error) {
+    } catch (error: any) {
       setFeedback({
         show: true,
         message: error.response
@@ -131,7 +149,7 @@ export default function EventsPage() {
   };
 
   // Toggle favorite status
-  const toggleFavorite = (eventId) => {
+  const toggleFavorite = (eventId: string) => {
     if (favoriteEvents.includes(eventId)) {
       setFavoriteEvents(favoriteEvents.filter(id => id !== eventId));
     } else {
@@ -140,7 +158,7 @@ export default function EventsPage() {
   };
 
   // Filter events based on category and search term
-  const filterEvents = (eventList) => {
+  const filterEvents = (eventList: Event[]): Event[] => {
     return eventList.filter(event => {
       const matchesCategory = selectedCategory === 'All' || event.category === selectedCategory;
       const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -153,7 +171,7 @@ export default function EventsPage() {
   // Get unique categories from events
   const categories = ['All', ...Array.from(new Set(events.map(event => event.category)))];
 
-  const renderEventCards = (eventList) => {
+  const renderEventCards = (eventList: Event[]) => {
     const filteredEvents = filterEvents(eventList);
 
     return (
@@ -288,7 +306,7 @@ export default function EventsPage() {
 
       <Tabs
         activeKey={selectedTab}
-        onSelect={(tab) => setSelectedTab(tab)}
+        onSelect={(tab) => setSelectedTab(tab as string)}
         id="events-tabs"
         className="mb-4"
       >
@@ -306,11 +324,11 @@ export default function EventsPage() {
           <div className="mb-4">
             <select
               className="form-select"
-              onChange={(e) => setSelectedCategory(e.target.value)}
               value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
             >
-              {categories.map((category, index) => (
-                <option key={index} value={category}>
+              {categories.map((category) => (
+                <option key={category} value={category}>
                   {category}
                 </option>
               ))}
@@ -319,13 +337,17 @@ export default function EventsPage() {
 
           {renderEventCards(events)}
         </Tab>
+
         <Tab eventKey="registered" title="Registered">
           {renderEventCards(registeredEvents)}
         </Tab>
       </Tabs>
 
       {feedback.show && (
-        <div className={`alert alert-${feedback.variant} mt-4`} role="alert">
+        <div
+          className={`alert alert-${feedback.variant} position-fixed top-0 start-50 translate-middle-x w-75`}
+          role="alert"
+        >
           {feedback.message}
         </div>
       )}
