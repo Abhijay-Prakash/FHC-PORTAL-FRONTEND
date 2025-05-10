@@ -3,15 +3,28 @@ import axios from '../axiosConfig';
 import { useParams } from 'react-router-dom';
 import { Card, Container, Row, Col, Badge, Spinner, Button } from 'react-bootstrap';
 
-const ProfilePage = () => {
-  const { userId } = useParams(); // dynamic from route
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+interface User {
+  name: string;
+  email: string;
+  role: string;
+  profilePic?: string;
+  phone?: string;
+  gender?: string;
+  semester?: string;
+  class?: string;
+  membershipId?: string;
+  eventsAttended?: string[];
+}
+
+const ProfilePage: React.FC = () => {
+  const { userId } = useParams<{ userId: string }>(); // dynamic from route
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`/users/profile`, {
+        const res = await axios.get<User>(`/users/profile`, {
           withCredentials: true
         });
         setUser(res.data);
@@ -48,7 +61,7 @@ const ProfilePage = () => {
     );
   }
 
-  const getInitials = (name) => {
+  const getInitials = (name: string): string => {
     return name.split(' ')
       .map((word) => word[0])
       .join('')
@@ -152,51 +165,24 @@ const ProfilePage = () => {
                 </Row>
                 
                 {user.membershipId && (
-                  <div className="info-card mb-3 p-3 border rounded bg-light">
-                    <div className="d-flex align-items-center">
-                      <div className="info-icon me-3">
-                        <i className="bi bi-credit-card-2-front text-success"></i>
-                      </div>
-                      <div>
-                        <div className="text-muted small">Membership ID</div>
-                        <div className="fw-bold">{user.membershipId}</div>
-                      </div>
+                  <div className="d-flex justify-content-between mb-3">
+                    <div>
+                      <div className="text-muted small">Membership ID</div>
+                      <div>{user.membershipId}</div>
                     </div>
                   </div>
                 )}
-                
-                <div className="info-card p-3 border rounded bg-light">
-                  <h5 className="border-bottom pb-2 mb-3">Activity</h5>
-                  <div className="d-flex align-items-center">
-                    <div className="info-icon me-3">
-                      <i className="bi bi-calendar2-event text-primary"></i>
-                    </div>
-                    <div>
-                      <div className="text-muted small">Events Attended</div>
-                      <div>
-                        <Badge bg="primary" pill className="px-3 py-2">
-                          {user.eventsAttended?.length || 0}
-                        </Badge>
-                        {user.eventsAttended?.length > 0 && (
-                          <Button variant="outline-primary" size="sm" className="ms-3">
-                            View Events
-                          </Button>
-                        )}
-                      </div>
-                    </div>
+
+                {user.eventsAttended && user.eventsAttended.length > 0 && (
+                  <div className="mb-3">
+                    <h5>Events Attended</h5>
+                    <ul className="list-unstyled">
+                      {user.eventsAttended.map((event, index) => (
+                        <li key={index}>{event}</li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
-                
-                <div className="d-flex justify-content-end mt-4">
-                  <Button variant="outline-secondary" className="me-2">
-                    <i className="bi bi-pencil me-1"></i>
-                    Edit Profile
-                  </Button>
-                  <Button variant="primary">
-                    <i className="bi bi-shield-lock me-1"></i>
-                    Change Password
-                  </Button>
-                </div>
+                )}
               </Card.Body>
             </div>
           </Card>
