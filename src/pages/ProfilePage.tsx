@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../axiosConfig';
 import { useParams } from 'react-router-dom';
 import { Card, Container, Row, Col, Badge, Spinner, Button } from 'react-bootstrap';
 
@@ -11,7 +11,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/users/profile`, {
+        const res = await axios.get(`/users/profile`, {
           withCredentials: true
         });
         setUser(res.data);

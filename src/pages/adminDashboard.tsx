@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../axiosConfig";
 
 type Event = {
   _id: string;
@@ -45,10 +45,10 @@ const AdminDashboard: React.FC = () => {
           attendanceRes,
           membersRes,
         ] = await Promise.all([
-          axios.get("http://localhost:5000/api/dashboard/stats",{withCredentials:true}),
-          axios.get("http://localhost:5000/api/dashboard/events/upcoming",{withCredentials:true}),
-          axios.get("http://localhost:5000/api/dashboard/attendance/recent",{withCredentials:true}),
-          axios.get("http://localhost:5000/api/dashboard/members/new",{withCredentials:true}),
+          axios.get("/dashboard/stats",{withCredentials:true}),
+          axios.get("/dashboard/events/upcoming",{withCredentials:true}),
+          axios.get("/dashboard/attendance/recent",{withCredentials:true}),
+          axios.get("/dashboard/members/new",{withCredentials:true}),
         ]);
 
         setStats(statsRes.data); // assuming stats is { totalUsers, totalEvents, totalBYTEParticipants }

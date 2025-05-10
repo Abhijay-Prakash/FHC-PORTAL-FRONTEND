@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../axiosConfig';
 import { Loader2, Globe, Server, Atom, BrainCircuit, CheckCircle, Info } from 'lucide-react';
 
 const domainIcons = {
@@ -35,7 +35,7 @@ const ByteRegistrationPage = () => {
   useEffect(() => {
     const checkRegistration = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/byte/my-registration', {
+        const res = await axios.get('/byte/my-registration', {
           withCredentials: true,
         });
 
@@ -60,7 +60,7 @@ const ByteRegistrationPage = () => {
 
     try {
       const res = await axios.post(
-        'http://localhost:5000/api/byte/register-byte',
+        '/byte/register-byte',
         { domain },
         { withCredentials: true }
       );

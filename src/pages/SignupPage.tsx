@@ -21,7 +21,7 @@ const SignupPage = () => {
     setMsg(''); // Clear any previous error messages
     
     try {
-      await axios.post('http://localhost:5000/api/auth/register', {
+      await axios.post('/auth/register', {
         name,
         email,
         phone,

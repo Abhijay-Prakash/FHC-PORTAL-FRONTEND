@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../axiosConfig';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -16,11 +16,11 @@ const LoginPage = () => {
     setMsg(''); // Clear any previous error messages
 
     try {
-      await axios.post(
-        'http://localhost:5000/api/auth/login', 
-        { email, password },
-        { withCredentials: true }
-      );
+        const response = await axios.post('/auth/login', { email, password });
+        const { token } = response.data;
+        localStorage.setItem('authToken', token);
+
+      
 
       // No need to save token since it's set in cookies by the backend
       navigate('/byte-register'); // Redirect to the homepage after successful login

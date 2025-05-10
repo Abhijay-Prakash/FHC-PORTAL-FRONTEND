@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Clock, MapPin, Users, ArrowRight, Star, Award, TrendingUp } from 'lucide-react';
 
@@ -54,7 +54,7 @@ const HomePage: React.FC = () => {
     const fetchEvents = async () => {
       setIsLoading(true);
       try {
-        const res = await axios.get('http://localhost:5000/api/events/getEvents', {
+        const res = await axios.get('/events/getEvents', {
           withCredentials: true,
         });
         const data: Event[] = res.data;

@@ -11,7 +11,7 @@ import {
   Col,
 } from 'react-bootstrap';
 import { Calendar, Clock, MapPin, Users, Search, Filter, Star, Heart } from 'lucide-react';
-import axios from 'axios';
+import axios from '../axiosConfig';
 
 // Event category color mapping - matching the admin panel
 const categoryColors = {
@@ -54,7 +54,7 @@ export default function EventsPage() {
   const fetchEvents = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/events/getEvents', {
+      const response = await axios.get('/events/getEvents', {
         withCredentials: true,
       });
       
@@ -72,7 +72,7 @@ export default function EventsPage() {
   // Fetch registered events
   const fetchRegisteredEvents = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/events/registered', {
+      const response = await axios.get('/events/registered', {
         withCredentials: true,
       });
       setRegisteredEvents(response.data.events);
@@ -103,7 +103,7 @@ export default function EventsPage() {
   const registerForEvent = async (eventId) => {
     try {
       await axios.post(
-        'http://localhost:5000/api/events/register',
+        '/events/register',
         { eventId },
         { withCredentials: true }
       );
@@ -482,7 +482,7 @@ export default function EventsPage() {
       </Container>
       
       {/* CSS for animations */}
-      <style jsx>{`
+      <style tsx>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
