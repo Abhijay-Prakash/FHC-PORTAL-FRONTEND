@@ -10,6 +10,7 @@ import {
   Trophy,
   Users,
   Menu,
+
   Cpu,
 } from "lucide-react";
 
@@ -72,7 +73,7 @@ export default function Sidebar() {
       <div
         className="d-none d-md-block border-end bg-light p-3"
         style={{
-          width: "250px",
+          width: "170px",
           height: "100vh",
           position: "fixed",
           top: 0,
