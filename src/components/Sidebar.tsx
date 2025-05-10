@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Offcanvas, Button, Nav } from "react-bootstrap";
 import {
@@ -10,9 +10,6 @@ import {
   Trophy,
   Users,
   Menu,
-  Code,
-  Binary,
-  BrainCircuit,
   Cpu,
 } from "lucide-react";
 
