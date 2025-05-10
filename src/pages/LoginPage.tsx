@@ -10,7 +10,7 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     setLoading(true);
     setMsg(''); // Clear any previous error messages
@@ -25,7 +25,8 @@ const LoginPage = () => {
       // No need to save token since it's set in cookies by the backend
       navigate('/byte-register'); // Redirect to the homepage after successful login
     } catch (err) {
-      setMsg(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      const error = err as any;
+      setMsg(error.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }

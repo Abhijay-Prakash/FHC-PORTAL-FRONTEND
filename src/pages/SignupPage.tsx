@@ -1,25 +1,26 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import axios from '../axiosConfig';
 import { useNavigate, Link } from 'react-router-dom';
 
+
 const SignupPage = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [gender, setGender] = useState('');
-  const [semester, setSemester] = useState('');
-  const [classValue, setClassValue] = useState('');
-  const [msg, setMsg] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [gender, setGender] = useState<string>('');
+  const [semester, setSemester] = useState<string>('');
+  const [classValue, setClassValue] = useState<string>('');
+  const [msg, setMsg] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const handleSignup = async (e) => {
+  const handleSignup = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMsg(''); // Clear any previous error messages
-    
+
     try {
       await axios.post('/auth/register', {
         name,
@@ -33,7 +34,7 @@ const SignupPage = () => {
         withCredentials: true
       });
       navigate('/');
-    } catch (err) {
+    } catch (err: any) {
       setMsg(err.response?.data?.message || 'Signup failed');
     } finally {
       setLoading(false);

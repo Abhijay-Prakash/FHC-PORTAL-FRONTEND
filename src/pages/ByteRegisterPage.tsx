@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, JSX } from 'react';
 import axios from '../axiosConfig';
 import { Loader2, Globe, Server, Atom, BrainCircuit, CheckCircle, Info } from 'lucide-react';
 
@@ -46,7 +46,7 @@ const ByteRegistrationPage = () => {
   const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [checkingRegistration, setCheckingRegistration] = useState<boolean>(true);
-  const [hoveredDomain, setHoveredDomain] = useState<string>('');
+
 
   // Check if already registered when component loads
   useEffect(() => {
@@ -132,8 +132,7 @@ const ByteRegistrationPage = () => {
                               transition: 'all 0.2s ease',
                             }}
                             onClick={() => setDomain(key)}
-                            onMouseEnter={() => setHoveredDomain(key)}
-                            onMouseLeave={() => setHoveredDomain('')}
+                        
                           >
                             <div className="d-flex align-items-center">
                               <div className="me-3">{domainIcons[key as keyof DomainIcons]}</div>

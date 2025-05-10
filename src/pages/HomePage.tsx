@@ -479,22 +479,7 @@ const HomePage: React.FC = () => {
         </div>
       </div>
       
-      {/* CSS for animations */}
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes fadeInRight {
-          from { opacity: 0; transform: translateX(20px) rotate(2deg); }
-          to { opacity: 1; transform: translateX(0) rotate(2deg); }
-        }
-        
-        .btn:hover .shine-effect {
-          left: 100%;
-        }
-      `}</style>
+      
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../axiosConfig';
 import { useParams } from 'react-router-dom';
-import { Card, Container, Row, Col, Badge, Spinner, Button } from 'react-bootstrap';
+import { Card, Container, Row, Col, Badge, Spinner } from 'react-bootstrap';
 
 interface User {
   name: string;
