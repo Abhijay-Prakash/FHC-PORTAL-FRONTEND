@@ -1,22 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import axios from '../axiosConfig';
 import { Loader2, Globe, Server, Atom, BrainCircuit, CheckCircle, Info } from 'lucide-react';
 
-const domainIcons = {
+interface DomainIcons {
+  [key: string]: JSX.Element;
+}
+
+interface DomainLabels {
+  [key: string]: string;
+}
+
+interface DomainDescriptions {
+  [key: string]: string;
+}
+
+interface RegistrationResponse {
+  registered: boolean;
+  domain: string;
+}
+
+const domainIcons: DomainIcons = {
   webdev: <Globe className="text-primary" size={48} />,
   backend: <Server className="text-success" size={48} />,
   react: <Atom className="text-info" size={48} />,
   ml: <BrainCircuit className="text-warning" size={48} />,
 };
 
-const domainLabels = {
+const domainLabels: DomainLabels = {
   webdev: 'Web Development',
   backend: 'Backend Development',
   react: 'React Development',
   ml: 'Machine Learning',
 };
 
-const domainDescriptions = {
+const domainDescriptions: DomainDescriptions = {
   webdev: 'Learn HTML, CSS, JavaScript and build responsive websites from scratch.',
   backend: 'Master server-side technologies, APIs, and database management.',
   react: 'Create dynamic user interfaces with React.js and modern frontend tools.',
@@ -24,18 +41,18 @@ const domainDescriptions = {
 };
 
 const ByteRegistrationPage = () => {
-  const [domain, setDomain] = useState('');
-  const [msg, setMsg] = useState('');
-  const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [checkingRegistration, setCheckingRegistration] = useState(true);
-  const [hoveredDomain, setHoveredDomain] = useState('');
+  const [domain, setDomain] = useState<string>('');
+  const [msg, setMsg] = useState<string>('');
+  const [success, setSuccess] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [checkingRegistration, setCheckingRegistration] = useState<boolean>(true);
+  const [hoveredDomain, setHoveredDomain] = useState<string>('');
 
   // Check if already registered when component loads
   useEffect(() => {
     const checkRegistration = async () => {
       try {
-        const res = await axios.get('/byte/my-registration', {
+        const res = await axios.get<RegistrationResponse>('/byte/my-registration', {
           withCredentials: true,
         });
 
@@ -53,21 +70,17 @@ const ByteRegistrationPage = () => {
     checkRegistration();
   }, []);
 
-  const handleByteRegistration = async (e) => {
+  const handleByteRegistration = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMsg('');
 
     try {
-      const res = await axios.post(
-        '/byte/register-byte',
-        { domain },
-        { withCredentials: true }
-      );
+      const res = await axios.post('/byte/register-byte', { domain }, { withCredentials: true });
 
       setSuccess(true);
       setMsg(res.data.message);
-    } catch (err) {
+    } catch (err: any) {
       setSuccess(false);
       setMsg(err.response?.data?.message || 'Registration failed');
     } finally {
@@ -111,30 +124,26 @@ const ByteRegistrationPage = () => {
                     <div className="row mb-4">
                       {Object.keys(domainLabels).map((key) => (
                         <div className="col-md-6 mb-3" key={key}>
-                          <div 
+                          <div
                             className={`domain-card p-3 border rounded-lg ${domain === key ? 'border-primary' : ''}`}
-                            style={{ 
-                              cursor: 'pointer', 
+                            style={{
+                              cursor: 'pointer',
                               backgroundColor: domain === key ? 'rgba(13, 110, 253, 0.05)' : 'white',
-                              transition: 'all 0.2s ease'
+                              transition: 'all 0.2s ease',
                             }}
                             onClick={() => setDomain(key)}
                             onMouseEnter={() => setHoveredDomain(key)}
                             onMouseLeave={() => setHoveredDomain('')}
                           >
                             <div className="d-flex align-items-center">
-                              <div className="me-3">
-                                {domainIcons[key]}
-                              </div>
+                              <div className="me-3">{domainIcons[key as keyof DomainIcons]}</div>
                               <div>
                                 <div className="d-flex align-items-center">
-                                  <h5 className="mb-0">{domainLabels[key]}</h5>
-                                  {domain === key && (
-                                    <CheckCircle size={18} className="text-primary ms-2" />
-                                  )}
+                                  <h5 className="mb-0">{domainLabels[key as keyof DomainLabels]}</h5>
+                                  {domain === key && <CheckCircle size={18} className="text-primary ms-2" />}
                                 </div>
                                 <p className="text-muted small mb-0 mt-1">
-                                  {domainDescriptions[key]}
+                                  {domainDescriptions[key as keyof DomainDescriptions]}
                                 </p>
                               </div>
                             </div>
@@ -146,9 +155,9 @@ const ByteRegistrationPage = () => {
                     <input type="hidden" value={domain} required />
 
                     <div className="d-grid gap-2">
-                      <button 
-                        type="submit" 
-                        className="btn btn-primary btn-lg" 
+                      <button
+                        type="submit"
+                        className="btn btn-primary btn-lg"
                         disabled={loading || !domain}
                       >
                         {loading ? (
@@ -157,7 +166,7 @@ const ByteRegistrationPage = () => {
                             Processing...
                           </>
                         ) : (
-                          <>Register for {domain ? domainLabels[domain] : 'Selected Domain'}</>
+                          <>Register for {domain ? domainLabels[domain as keyof DomainLabels] : 'Selected Domain'}</>
                         )}
                       </button>
                     </div>
@@ -166,16 +175,16 @@ const ByteRegistrationPage = () => {
               ) : (
                 <div className="text-center py-4">
                   <div className="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 rounded-circle p-4 mb-4">
-                    {domainIcons[domain]}
+                    {domainIcons[domain as keyof DomainIcons]}
                   </div>
-                  
+
                   <h3 className="text-success mb-3">Registration Successful!</h3>
-                  
+
                   <div className="mb-4">
                     <p className="mb-1">You are now registered for:</p>
-                    <h4 className="text-primary">{domainLabels[domain]}</h4>
+                    <h4 className="text-primary">{domainLabels[domain as keyof DomainLabels]}</h4>
                   </div>
-                  
+
                   <div className="p-3 bg-light rounded mb-4">
                     <div className="d-flex align-items-center">
                       <Info size={24} className="text-muted me-3" />
@@ -187,11 +196,9 @@ const ByteRegistrationPage = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="d-grid gap-2">
-                    <button className="btn btn-outline-primary">
-                      View Class Details
-                    </button>
+                    <button className="btn btn-outline-primary">View Class Details</button>
                   </div>
                 </div>
               )}
