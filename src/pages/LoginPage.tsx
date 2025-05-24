@@ -22,7 +22,7 @@ const LoginPage = () => {
 
       
 
-      // No need to save token since it's set in cookies by the backend
+     
       navigate('/byte-register'); // Redirect to the homepage after successful login
     } catch (err) {
       const error = err as any;

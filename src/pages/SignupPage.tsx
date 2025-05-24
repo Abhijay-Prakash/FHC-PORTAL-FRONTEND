@@ -22,17 +22,21 @@ const SignupPage = () => {
     setMsg(''); // Clear any previous error messages
 
     try {
-      await axios.post('/auth/register', {
-        name,
-        email,
-        phone,
-        password,
-        gender,
-        semester,
-        class: classValue,
-      }, {
-        withCredentials: true
-      });
+        const response = await axios.post('/auth/register', {
+          name,
+          email,
+          phone,
+          password,
+          gender,
+          semester,
+          class: classValue,
+        }, {
+          withCredentials: true
+        });
+
+        const { token } = response.data;
+
+      localStorage.setItem('authToken', token);
       navigate('/');
     } catch (err: any) {
       setMsg(err.response?.data?.message || 'Signup failed');
