@@ -1,6 +1,13 @@
 import { useState, useEffect, FormEvent, JSX } from 'react';
 import axios from '../axiosConfig';
-import { Loader2, Globe, Server, Atom, BrainCircuit, CheckCircle, Info } from 'lucide-react';
+import {
+  Loader2,
+  Globe,
+  Atom,
+  CheckCircle,
+  Info,
+  ShieldCheck,
+} from 'lucide-react';
 
 interface DomainIcons {
   [key: string]: JSX.Element;
@@ -17,38 +24,31 @@ interface DomainDescriptions {
 interface RegistrationResponse {
   registered: boolean;
   domain: string;
+  paymentVerified: boolean;
 }
 
 const domainIcons: DomainIcons = {
   webdev: <Globe className="text-primary" size={48} />,
-  backend: <Server className="text-success" size={48} />,
-  react: <Atom className="text-info" size={48} />,
-  ml: <BrainCircuit className="text-warning" size={48} />,
+  mern: <Atom className="text-info" size={48} />,
 };
 
 const domainLabels: DomainLabels = {
   webdev: 'Web Development',
-  backend: 'Backend Development',
-  react: 'React Development',
-  ml: 'Machine Learning',
+  mern: 'MERN Stack',
 };
 
 const domainDescriptions: DomainDescriptions = {
   webdev: 'Learn HTML, CSS, JavaScript and build responsive websites from scratch.',
-  backend: 'Master server-side technologies, APIs, and database management.',
-  react: 'Create dynamic user interfaces with React.js and modern frontend tools.',
-  ml: 'Explore data science, neural networks, and AI model development.',
+  mern: 'Full-stack development with MongoDB, Express, React, and Node.js.',
 };
 
 const ByteRegistrationPage = () => {
   const [domain, setDomain] = useState<string>('');
   const [msg, setMsg] = useState<string>('');
-  const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [checkingRegistration, setCheckingRegistration] = useState<boolean>(true);
+  const [registration, setRegistration] = useState<RegistrationResponse | null>(null);
 
-
-  // Check if already registered when component loads
   useEffect(() => {
     const checkRegistration = async () => {
       try {
@@ -57,8 +57,8 @@ const ByteRegistrationPage = () => {
         });
 
         if (res.data.registered) {
-          setSuccess(true);
           setDomain(res.data.domain);
+          setRegistration(res.data);
         }
       } catch (err) {
         console.error('Registration check failed');
@@ -76,17 +76,29 @@ const ByteRegistrationPage = () => {
     setMsg('');
 
     try {
-      const res = await axios.post('/byte/register-byte', { domain }, { withCredentials: true });
+      const res = await axios.post(
+        '/byte/register-byte',
+        { domain },
+        { withCredentials: true }
+      );
 
-      setSuccess(true);
+      const updated: RegistrationResponse = {
+        registered: true,
+        domain,
+        paymentVerified: false,
+      };
+
+      setRegistration(updated);
       setMsg(res.data.message);
     } catch (err: any) {
-      setSuccess(false);
       setMsg(err.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
   };
+
+  const isRegistered = registration?.registered;
+  const isVerified = registration?.paymentVerified;
 
   if (checkingRegistration) {
     return (
@@ -110,11 +122,12 @@ const ByteRegistrationPage = () => {
             </div>
 
             <div className="card-body p-4">
-              {!success ? (
+              {!isRegistered ? (
                 <>
+                  {/* REGISTRATION FORM */}
                   <div className="mb-4 text-center">
                     <div className="d-inline-flex align-items-center justify-content-center bg-light rounded-circle p-3 mb-3">
-                      <BrainCircuit size={32} className="text-primary" />
+                      <Atom size={32} className="text-primary" />
                     </div>
                     <h4>Choose Your Learning Path</h4>
                     <p className="text-muted">Select a domain that aligns with your interests and career goals</p>
@@ -122,7 +135,7 @@ const ByteRegistrationPage = () => {
 
                   <form onSubmit={handleByteRegistration}>
                     <div className="row mb-4">
-                      {Object.keys(domainLabels).map((key) => (
+                      {Object.keys(domainLabels).map((key: string) => (
                         <div className="col-md-6 mb-3" key={key}>
                           <div
                             className={`domain-card p-3 border rounded-lg ${domain === key ? 'border-primary' : ''}`}
@@ -132,26 +145,21 @@ const ByteRegistrationPage = () => {
                               transition: 'all 0.2s ease',
                             }}
                             onClick={() => setDomain(key)}
-                        
                           >
                             <div className="d-flex align-items-center">
-                              <div className="me-3">{domainIcons[key as keyof DomainIcons]}</div>
+                              <div className="me-3">{domainIcons[key]}</div>
                               <div>
                                 <div className="d-flex align-items-center">
-                                  <h5 className="mb-0">{domainLabels[key as keyof DomainLabels]}</h5>
+                                  <h5 className="mb-0">{domainLabels[key]}</h5>
                                   {domain === key && <CheckCircle size={18} className="text-primary ms-2" />}
                                 </div>
-                                <p className="text-muted small mb-0 mt-1">
-                                  {domainDescriptions[key as keyof DomainDescriptions]}
-                                </p>
+                                <p className="text-muted small mb-0 mt-1">{domainDescriptions[key]}</p>
                               </div>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
-
-                    <input type="hidden" value={domain} required />
 
                     <div className="d-grid gap-2">
                       <button
@@ -165,44 +173,56 @@ const ByteRegistrationPage = () => {
                             Processing...
                           </>
                         ) : (
-                          <>Register for {domain ? domainLabels[domain as keyof DomainLabels] : 'Selected Domain'}</>
+                          <>Register for {domainLabels[domain as keyof DomainLabels] || 'Selected Domain'}</>
                         )}
                       </button>
                     </div>
                   </form>
                 </>
               ) : (
+                // AFTER REGISTRATION
                 <div className="text-center py-4">
                   <div className="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 rounded-circle p-4 mb-4">
-                    {domainIcons[domain as keyof DomainIcons]}
+                    {domainIcons[domain]}
                   </div>
 
-                  <h3 className="text-success mb-3">Registration Successful!</h3>
+                  <h3 className="text-success mb-3">
+                    {isVerified ? 'You’re Fully Registered!' : 'Registration Pending Verification'}
+                  </h3>
 
                   <div className="mb-4">
-                    <p className="mb-1">You are now registered for:</p>
-                    <h4 className="text-primary">{domainLabels[domain as keyof DomainLabels]}</h4>
+                    <p className="mb-1">Registered for:</p>
+                    <h4 className="text-primary">{domainLabels[domain]}</h4>
                   </div>
 
-                  <div className="p-3 bg-light rounded mb-4">
-                    <div className="d-flex align-items-center">
-                      <Info size={24} className="text-muted me-3" />
-                      <div className="text-start">
-                        <h5 className="mb-1">What's Next?</h5>
-                        <p className="text-muted mb-0">
-                          Check your email for class schedule details and preparation materials.
-                        </p>
+                  {isVerified ? (
+                    <div className="alert alert-success d-flex align-items-center mb-4">
+                      <ShieldCheck size={20} className="me-2" />
+                      Your payment has been verified. Check your email/WhatsApp for class details.
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-light rounded mb-4">
+                      <div className="d-flex align-items-center">
+                        <Info size={24} className="text-muted me-3" />
+                        <div className="text-start">
+                          <h5 className="mb-1">What’s Next?</h5>
+                          <p className="text-muted mb-0">
+                            Wait for admin to verify your payment. You’ll receive a WhatsApp group link via email/phone once verified.
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="d-grid gap-2">
-                    <button className="btn btn-outline-primary">View Class Details</button>
+                    <button className="btn btn-outline-primary" disabled>
+                      {isVerified ? 'View Class Details' : 'Waiting for Admin Approval'}
+                    </button>
                   </div>
                 </div>
               )}
 
-              {msg && !success && (
+              {msg && !isRegistered && (
                 <div className="alert alert-danger d-flex align-items-center mt-4" role="alert">
                   <i className="bi bi-exclamation-triangle-fill me-2"></i>
                   <div>{msg}</div>
